@@ -1,0 +1,12 @@
+,Unnamed: 0,country,description,designation,points,price,province,region_1,region_2,taster_name,taster_twitter_handle,title,variety,winery
+count,22387.0,22387,22387,22387,22387.0,22387.0,22387,22387,22387,22387,22387,22387,22387,22387
+unique,,1,20491,9515,,,4,171,17,11,11,20425,183,2791
+top,,US,"Seductively tart in lemon pith, cranberry and pomegranate, this refreshing, light-bodied quaff is infinitely enjoyable, both on its own or at the table. It continues to expand on the palate into an increasing array of fresh flavors, finishing in cherry and orange.",Estate,,,California,Columbia Valley (WA),Columbia Valley,Virginie Boone,@vboone,Gloria Ferrer NV Sonoma Brut Sparkling (Sonoma County),Pinot Noir,Columbia Crest
+freq,,22387,3,809,,,12900,2488,5532,6422,6422,6,4788,157
+mean,65656.94474471791,,,,89.53781212310716,41.465404029124045,,,,,,,,
+std,37566.72549911358,,,,2.809305589149649,29.379373551077546,,,,,,,,
+min,4.0,,,,80.0,4.0,,,,,,,,
+25%,33404.0,,,,88.0,25.0,,,,,,,,
+50%,66312.0,,,,90.0,36.0,,,,,,,,
+75%,98460.5,,,,92.0,50.0,,,,,,,,
+max,129950.0,,,,100.0,2013.0,,,,,,,,
