@@ -1,5 +1,5 @@
 -- Testing connection
---SELECT * FROM Artist LIMIT 5; 
+SELECT * FROM Artist LIMIT 5; 
 
 -- Check tables and show column headings
 SELECT * FROM sqlite_master WHERE type = 'table';
@@ -102,3 +102,62 @@ SELECT invoice.Total AS total,
     JOIN InvoiceLine AS invoice_line
     ON invoice.InvoiceId = invoice_line.InvoiceId;
 
+-- Finding number of customers 
+SELECT DISTINCT COUNT(CustomerId)
+    FROM Customer;
+SELECT DISTINCT CustomerId, COUNT(CustomerId) AS count
+    FROM Invoice
+    GROUP BY CustomerId;
+SELECT COUNT(DISTINCT CustomerId) AS unique_customers
+    FROM Invoice;
+
+-- Finding the number of Invoices/Transactions
+SELECT COUNT(*) AS transactions
+    FROM Invoice;
+
+-- Average Invoice value 
+SELECT AVG(Total)
+    FROM Invoice
+SELECT (SUM(Total)/COUNT(Total)) AS avg_total
+    FROM Invoice;
+
+-- Average items per invoice
+SELECT InvoiceId, SUM(Quantity) AS quantity_sum
+    FROM InvoiceLine
+    GROUP BY InvoiceId;
+
+SELECT AVG(items_per_invoice) AS avg_items_per_invoice
+    FROM (
+        SELECT InvoiceId, SUM(Quantity) AS items_per_invoice
+            FROM InvoiceLine
+            GROUP BY InvoiceId
+    );
+
+-- Average Revenue per Customer
+SELECT CustomerId, SUM(Total) AS total_sum
+    FROM Invoice
+    GROUP BY CustomerId;
+
+SELECT AVG(rev_per_customer) AS avg_rev_per_customer
+    FROM (
+        SELECT CustomerId, SUM(Total) AS rev_per_customer
+    FROM Invoice
+    GROUP BY CustomerId
+    );
+
+-- Revenue by Country
+SELECT customer.Country AS country,
+    SUM(invoice.Total) as country_total
+        FROM Customer AS customer
+        JOIN Invoice AS invoice
+        ON customer.CustomerId = invoice.CustomerId
+        GROUP BY customer.Country
+
+-- Monthly Revenue
+SELECT STRFTIME('%Y-%m', InvoiceDate) AS invoice_date,
+    SUM(Total) AS total_per_month
+    FROM Invoice
+    GROUP BY invoice_date
+    ORDER BY invoice_date
+    
+    
