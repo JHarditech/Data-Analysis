@@ -1,3 +1,4 @@
+--      Connect and Sanity check the DB
 -- Testing connection
 SELECT * FROM Artist LIMIT 5; 
 
@@ -34,6 +35,7 @@ SELECT COUNT(*) FROM Track;
 -- Identity check
 PRAGMA integrity_check;
 
+--      Sanity Checks (data quality quick tests)
 -- Checking for NULLs and negative values
 SELECT * FROM InvoiceLine 
     WHERE UnitPrice IS NULL;
@@ -87,6 +89,7 @@ SELECT TrackID, COUNT(*) AS count
     HAVING COUNT(*) > 1;
 
 
+--      Compute KPIs (core metrics)
 -- Calculating Total Revenue
 SELECT SUM(Total)
     FROM Invoice
@@ -160,4 +163,60 @@ SELECT STRFTIME('%Y-%m', InvoiceDate) AS invoice_date,
     GROUP BY invoice_date
     ORDER BY invoice_date
     
-    
+--      Top Performers - design & checks
+-- Customers by revenue
+SELECT SUM(invoice.Total) AS total_per_customer,
+    customer.FirstName,
+    customer.LastName,
+    customer.City
+    FROM Invoice AS invoice
+    JOIN Customer AS customer
+    ON invoice.CustomerId = customer.CustomerId
+    GROUP BY customer.CustomerId
+    ORDER BY total_per_customer DESC 
+    LIMIT 10;
+
+-- Tracks by revenue
+SELECT TrackID,
+    SUM(UnitPrice) AS total_per_track
+    FROM InvoiceLine
+    GROUP BY TrackID
+    ORDER BY total_per_track DESC
+    LIMIT 20;
+
+SELECT track.TrackId AS track_id,
+    track.Name AS song_name,
+    album.Title As album,
+    artist.NAME AS artist,
+    SUM(invoice_line.UnitPrice) AS revenue_per_track
+    FROM InvoiceLine AS invoice_line
+    JOIN Track AS track
+    ON invoice_line.TrackId = track.TrackId
+    JOIN Album AS album
+    ON track.AlbumId = album.AlbumId
+    JOIN Artist AS artist
+    ON album.ArtistId = artist.ArtistId
+    GROUP BY track.TrackId 
+    ORDER BY revenue_per_track DESC
+    LIMIT 10;
+
+-- Genres by revenue
+SELECT GenreID,
+    COUNT(GenreID)
+    FROM Track
+    GROUP BY GenreId;
+
+SELECT genre.GenreID AS genre_id,
+    genre.Name AS genre_name,
+    SUM(invoice_line.UnitPrice * invoice_line.Quantity) AS revenue_per_genre
+    FROM InvoiceLine AS invoice_line
+    JOIN Track as track 
+    ON invoice_line.TrackId = track.TrackId 
+    JOIN Genre AS genre 
+    ON genre.GenreId = track.GenreId
+    GROUP BY genre.Name 
+    ORDER BY revenue_per_genre DESC;
+/* Worth noting that multiplying by quantity in the aggregation formula is 
+unnecessary as the Quantity in InvoiceLine is always 1, but it's worth having in the
+calculation in case that changes */
+
