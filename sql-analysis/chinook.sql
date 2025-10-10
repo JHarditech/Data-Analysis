@@ -220,3 +220,57 @@ SELECT genre.GenreID AS genre_id,
 unnecessary as the Quantity in InvoiceLine is always 1, but it's worth having in the
 calculation in case that changes */
 
+
+--      Time Series & Trends
+-- Monthly revenue grouped by bucket
+--No different to monthly revenue above, not sure what the intention is for this query
+SELECT STRFTIME('%Y-%m', InvoiceDate) AS month_bucket,
+    SUM(Total) AS revenue
+    FROM Invoice
+    GROUP BY month_bucket
+    ORDER BY month_bucket;
+
+-- Monthly order counts - distinct invoice ids per month
+SELECT STRFTIME('%Y-%m', InvoiceDate) AS invoice_date,
+    COUNT(DISTINCT InvoiceId)
+    FROM Invoice
+    GROUP BY invoice_date
+    ORDER BY invoice_date;
+
+-- Month-over-monnth growth
+SELECT month, 
+    revenue, 
+    ROUND(revenue - LAG(revenue, 1) OVER (ORDER BY month), 2) AS monthly_change
+    FROM (
+        SELECT STRFTIME('%Y-%m', InvoiceDate) AS month,
+            SUM(Total) AS revenue
+            FROM Invoice
+            GROUP BY month
+            ORDER BY month
+    );
+
+--      Customer Behaviour & Cohorts
+-- First purchase date for each customer
+SELECT DISTINCT customer.CustomerId AS customer_id, 
+    MIN(STRFTIME('%Y-%m-%d', invoice.InvoiceDate)) AS first_invoice
+    FROM Customer AS customer 
+    JOIN Invoice AS invoice 
+    ON customer.CustomerId = invoice.CustomerId 
+    GROUP BY customer.CustomerId 
+    ORDER BY customer.CustomerId;
+
+-- Number of invoices per customer
+SELECT DISTINCT customer.CustomerId AS customer_id, 
+    COUNT(invoice.CustomerId) AS number_of_invoices
+    FROM Customer AS customer 
+    JOIN Invoice AS invoice 
+    ON customer.CustomerId = invoice.CustomerId 
+    GROUP BY customer.CustomerId 
+    ORDER BY customer.CustomerId;
+--Check
+SELECT COUNT(CustomerId)
+    FROM Invoice
+    GROUP BY CustomerId
+    ORDER BY CustomerId;
+
+-- Customer retention: purchased in two consecutive months
